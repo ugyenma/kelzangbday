@@ -12,11 +12,36 @@ import "./App.css";
 import Confetti from "./Confetti";
 import { useEffect, useRef, useState } from "react";
 import birthdaySong from "./assets/bdayaudo.mp3";
+import kelz1 from "./assets/kelz1.jpeg";
+import kelz2 from "./assets/kelz2.jpeg";
+import kelz3 from "./assets/kelz3.jpeg";
+import kelz4 from "./assets/kelz4.jpeg";
+import kelz5 from "./assets/kelz5.jpeg";
+import kelz6 from "./assets/kelz6.jpeg";
+import kelz7 from "./assets/kelz7.jpeg";
+import kelz8 from "./assets/kelz8.jpeg";
+import kelz9 from "./assets/kelz9.jpeg";
+import kelz10 from "./assets/kelz10.jpeg";
 
+
+const kelzImages = [
+  kelz1,
+  kelz2,
+  kelz3,
+  kelz4,
+  kelz5,
+  kelz6,
+  kelz7,
+  kelz8,
+  kelz9,
+  kelz10,
+];
 
 export default function App() {
   const audioRef = useRef(null);
   const [staticFrame, setStaticFrame] = useState(null);
+  const [showKelz, setShowKelz] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
 
   const micStreamRef = useRef(null);
   const audioCtxRef = useRef(null);
@@ -46,6 +71,14 @@ export default function App() {
     const audio = audioRef.current;
     audio.play();
   };
+
+  useEffect(() => {
+    if (!showKelz) return;
+    const timer = setInterval(() => {
+      setPhotoIndex((idx) => (idx + 1) % kelzImages.length);
+    }, 2200);
+    return () => clearInterval(timer);
+  }, [showKelz]);
 
   const pickStaticFrame = (rms) => {
     if (rms < 0.02) return null;
@@ -105,13 +138,6 @@ export default function App() {
   };
 
   const [celebrating, setCelebrating] = useState(false);
-  const [showMatthew, setShowMatthew] = useState(false);
-  let matthewSrc = null;
-  try {
-    matthewSrc = require("./assets/matthew.jpg");
-  } catch (e) {
-    matthewSrc = null;
-  }
   useEffect(() => {
     if (staticFrame === cake20) {
       stopMicMonitoring(false);
@@ -187,33 +213,41 @@ export default function App() {
       </div>
       {celebrating && (
         <Confetti
-          pieces={48}
-          duration={8000}
-          onDone={() => {
-            setCelebrating(false);
-            setTimeout(() => setShowMatthew(true), 250);
-          }}
-        />
-      )}
+      pieces={48}
+      duration={8000}
+      onDone={() => {
+        setCelebrating(false);
+        setTimeout(() => {
+          setPhotoIndex(0);
+          setShowKelz(true);
+        }, 250);
+      }}
+    />
+  )}
 
-      {showMatthew && (
+      {showKelz && (
         <div
-          className="matthew-overlay"
-          onClick={() => setShowMatthew(false)}
+          className="kelz-overlay"
+          onClick={() => setShowKelz(false)}
           onKeyDown={(e) => {
-            if (e.key === "Escape") setShowMatthew(false);
+            if (e.key === "Escape") setShowKelz(false);
           }}
           role="dialog"
           tabIndex={-1}
         >
-          <div className="matthew-card">
-            {matthewSrc ? (
-              <img src={matthewSrc} alt="Matthew" />
-            ) : (
-              <div style={{ color: "white", padding: 24, fontSize: 20 }}>
-                Matthew
-              </div>
-            )}
+          <div className="kelz-banner kelz-banner-top">
+            Wish you a happy 21st
+          </div>
+          <div className="kelz-card">
+            <img
+              key={photoIndex}
+              className="kelz-photo"
+              src={kelzImages[photoIndex]}
+              alt="Kelz"
+            />
+          </div>
+          <div className="kelz-banner kelz-banner-bottom">
+            December 3rd 2025
           </div>
         </div>
       )}
