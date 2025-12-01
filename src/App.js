@@ -10,7 +10,7 @@ import cake20 from "./assets/20.png";
 import birthdayText from "./assets/birthdaytext.png";
 import "./App.css";
 import Confetti from "./Confetti";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import birthdaySong from "./assets/bdayaudo.mp3";
 import kelz1 from "./assets/kelz1.jpeg";
 import kelz2 from "./assets/kelz2.jpeg";
@@ -80,16 +80,16 @@ export default function App() {
     return () => clearInterval(timer);
   }, [showKelz]);
 
-  const pickStaticFrame = (rms) => {
+  const pickStaticFrame = useCallback((rms) => {
     if (rms < 0.02) return null;
     if (rms >= 0.30) return cake20;
     if (rms >= 0.22) return cake40;
     if (rms >= 0.15) return cake60;
     if (rms >= 0.08) return cake80;
     return cake100;
-  };
+  }, []);
 
-  const startMicMonitoring = async () => {
+  const startMicMonitoring = useCallback(async () => {
     if (micStreamRef.current) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -135,7 +135,7 @@ export default function App() {
     } catch (err) {
       console.warn("Microphone access denied or failed:", err);
     }
-  };
+  }, [pickStaticFrame]);
 
   const [celebrating, setCelebrating] = useState(false);
   useEffect(() => {
@@ -146,7 +146,7 @@ export default function App() {
   }, [staticFrame]);
 
 
-  const stopMicMonitoring = (resetAnimation = true) => {
+  const stopMicMonitoring = useCallback((resetAnimation = true) => {
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
@@ -174,7 +174,7 @@ export default function App() {
     if (resetAnimation) {
       setStaticFrame(null);
     }
-  };
+  }, []);
 
   return (
     <div className="App">
